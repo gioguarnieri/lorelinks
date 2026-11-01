@@ -41,6 +41,35 @@
       "Done": "Updated {count} link(s) to \"{name}\".",
       "Skipped": "{count} text field(s) were not updated because you do not own them.",
       "NoPermission": "Links to \"{name}\" were not updated because you do not own the documents that contain them."
+    },
+    "Obsidian": {
+      "Export": {
+        "Title": "Export to Obsidian",
+        "Button": "Export",
+        "Hint": "Download a zip of your journal as an Obsidian vault: one Markdown file per note, with [[links]] that keep working in Obsidian. Unzip it and open the folder as a vault.",
+        "Actors": "Include actors (biographies) as notes",
+        "Items": "Include items (descriptions) as notes",
+        "Images": "Copy images into the vault",
+        "Working": "Exporting to Obsidian…",
+        "Done": "Exported {notes} note(s) and {images} image(s).",
+        "MissingImages": "{count} image(s) could not be copied and were left out.",
+        "Failed": "Export failed: {error}"
+      },
+      "Import": {
+        "Title": "Import from Obsidian",
+        "Button": "Import",
+        "Hint": "Choose an Obsidian vault folder, or individual Markdown files and the images they embed. Each note becomes a journal entry; images are uploaded to the world.",
+        "Folder": "Vault folder",
+        "Files": "Or individual files",
+        "KeepFolders": "Recreate the vault's folders as journal folders",
+        "Update": "Update notes that already exist instead of creating copies",
+        "NoNotes": "No Markdown (.md) files were selected.",
+        "Working": "Importing from Obsidian…",
+        "Done": "Imported notes: {created} created, {updated} updated. {images} image(s) uploaded.",
+        "Skipped": "{skipped} actor or item note(s) were skipped; only journal notes are imported.",
+        "FailedImages": "{count} image(s) could not be uploaded: {names}",
+        "Failed": "Import failed: {error}"
+      }
     }
   }
 }

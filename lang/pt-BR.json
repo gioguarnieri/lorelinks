@@ -41,6 +41,35 @@
       "Done": "{count} vínculo(s) atualizado(s) para \"{name}\".",
       "Skipped": "{count} campo(s) de texto não foram atualizados porque você não é dono deles.",
       "NoPermission": "Os vínculos para \"{name}\" não foram atualizados porque você não é dono dos documentos que os contêm."
+    },
+    "Obsidian": {
+      "Export": {
+        "Title": "Exportar para o Obsidian",
+        "Button": "Exportar",
+        "Hint": "Baixe um zip do seu diário como um cofre (vault) do Obsidian: um arquivo Markdown por nota, com [[vínculos]] que continuam funcionando no Obsidian. Descompacte e abra a pasta como cofre.",
+        "Actors": "Incluir atores (biografias) como notas",
+        "Items": "Incluir itens (descrições) como notas",
+        "Images": "Copiar imagens para o cofre",
+        "Working": "Exportando para o Obsidian…",
+        "Done": "{notes} nota(s) e {images} imagem(ns) exportadas.",
+        "MissingImages": "{count} imagem(ns) não puderam ser copiadas e ficaram de fora.",
+        "Failed": "A exportação falhou: {error}"
+      },
+      "Import": {
+        "Title": "Importar do Obsidian",
+        "Button": "Importar",
+        "Hint": "Escolha a pasta de um cofre do Obsidian, ou arquivos Markdown avulsos e as imagens que eles incorporam. Cada nota vira uma entrada de diário; as imagens são enviadas para o mundo.",
+        "Folder": "Pasta do cofre",
+        "Files": "Ou arquivos avulsos",
+        "KeepFolders": "Recriar as pastas do cofre como pastas do diário",
+        "Update": "Atualizar notas que já existem em vez de criar cópias",
+        "NoNotes": "Nenhum arquivo Markdown (.md) foi selecionado.",
+        "Working": "Importando do Obsidian…",
+        "Done": "Notas importadas: {created} criadas, {updated} atualizadas. {images} imagem(ns) enviadas.",
+        "Skipped": "{skipped} nota(s) de ator ou item foram ignoradas; só notas de diário são importadas.",
+        "FailedImages": "{count} imagem(ns) não puderam ser enviadas: {names}",
+        "Failed": "A importação falhou: {error}"
+      }
     }
   }
 }

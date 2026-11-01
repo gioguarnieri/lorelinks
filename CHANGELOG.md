@@ -11,4 +11,5 @@
 - `Ctrl+Shift+G` keybinding and Graph buttons in the Journal and Actors sidebars
 - Links to world items, with `[[Item:Name]]`; item descriptions are indexed and items appear in the graph
 - Renaming a journal entry, page, actor or item updates the links pointing to it (setting: ask, always or never)
+- Export journals, actors and items as a zipped Obsidian vault, and import Obsidian vaults or notes as journal entries
 - English and Brazilian Portuguese translations

@@ -80,3 +80,17 @@ span.lorelinks-hidden {
   background: none;
   border: 1px dashed var(--swatch);
 }
+
+/* Obsidian export and import dialogs */
+.lorelinks-obsidian-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.5rem 0;
+}
+
+.lorelinks-obsidian-options label.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}

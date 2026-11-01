@@ -25,6 +25,12 @@ suggests the notes and characters you can link to. Open the graph to see how eve
 - **Unresolved links** – links to notes that do not exist yet are shown dashed; clicking one creates the note.
 - **Respects permissions** – players see plain text instead of a link when they cannot view the target, and the graph
   only shows what the viewing user is allowed to see.
+- **Obsidian export** – download your journal (and optionally actors and items) as a zipped Obsidian vault: one
+  Markdown file per note, pages as headings, `[[links]]` and `@UUID` links as Obsidian links, secret blocks as
+  `> [!secret]` callouts, and images copied into `attachments/`.
+- **Obsidian import** – pick a vault folder (or some Markdown files) to create journal entries. Folders become journal
+  folders, embedded images are uploaded, callouts and highlights are converted, and notes exported by LoreLinks
+  update their original entries instead of creating copies.
 - Works anywhere Foundry renders rich text: journals, actor biographies, item descriptions and chat.
 
 Inline rolls such as `[[1d20]]` and commands such as `[[/r 2d6]]` or `[[/check dex]]` keep working as before.
@@ -38,6 +44,13 @@ https://github.com/gioguarnieri/lorelinks/releases/latest/download/module.json
 ```
 
 Requires Foundry VTT version 14.
+
+## Obsidian round trips
+
+Export and import are in the Journal sidebar header (GM only). Each exported note starts with frontmatter such as
+`foundry-uuid`, which lets a later import update the same journal entry. Actor and item notes are exported for
+reference and linking, but are not imported back. Foundry `@UUID` links come back as `[[wikilinks]]`, and images come
+back as uploaded copies in `worlds/<world>/lorelinks-obsidian/`.
 
 ## Roadmap
 

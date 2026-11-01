@@ -4,6 +4,9 @@ import { createAutocompletePlugin } from "./autocomplete.mjs";
 import { linkIndex, watchDocuments } from "./link-index.mjs";
 import { GraphView } from "./graph.mjs";
 import { registerRenameHandling } from "./rename.mjs";
+import { exportVault } from "./obsidian/export.mjs";
+import { importVault } from "./obsidian/import.mjs";
+import { openExportDialog, openImportDialog } from "./obsidian/dialogs.mjs";
 
 Hooks.once("init", () => {
   registerEnricher();
@@ -24,7 +27,9 @@ Hooks.once("ready", () => {
   game.modules.get(MODULE_ID).api = {
     resolve: target => resolveWikilink({ target }),
     backlinks: doc => linkIndex.backlinks(doc),
-    openGraph: () => GraphView.open()
+    openGraph: () => GraphView.open(),
+    exportVault,
+    importVault
   };
 });
 
@@ -33,22 +38,47 @@ Hooks.on("createProseMirrorEditor", (uuid, plugins) => {
 });
 
 /**
- * Add an "Open graph" button to the header of the Journal, Actors and Items sidebar tabs.
+ * A sidebar header button.
+ * @param {string} cls       CSS class, also used to avoid adding the button twice.
+ * @param {string} icon      Font Awesome icon class.
+ * @param {string} labelKey  Translation key for the label.
+ * @param {function(): void} onClick
+ * @param {boolean} [iconOnly=false]  Show only the icon, with the label as a tooltip.
+ * @returns {HTMLButtonElement}
+ */
+function headerButton(cls, icon, labelKey, onClick, iconOnly = false) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.classList.add(cls);
+  const label = game.i18n.localize(labelKey);
+  button.innerHTML = `<i class="${icon}" inert></i>${iconOnly ? "" : ` ${label}`}`;
+  if ( iconOnly ) Object.assign(button.dataset, { tooltipText: label });
+  button.setAttribute("aria-label", label);
+  button.addEventListener("click", onClick);
+  return button;
+}
+
+/**
+ * Add LoreLinks buttons to a sidebar tab header: the graph everywhere, Obsidian export and import for GMs in the
+ * Journal tab.
  * @param {foundry.applications.sidebar.DocumentDirectory} app
  * @param {HTMLElement} html
  */
-function addGraphButton(app, html) {
-  if ( html.querySelector(".lorelinks-open-graph") ) return;
+function addHeaderButtons(app, html) {
   const actions = html.querySelector(".header-actions");
-  if ( !actions ) return;
-  const button = document.createElement("button");
-  button.type = "button";
-  button.classList.add("lorelinks-open-graph");
-  button.innerHTML = `<i class="fa-solid fa-diagram-project" inert></i> ${game.i18n.localize("LORELINKS.Graph.Open")}`;
-  button.addEventListener("click", () => GraphView.open());
-  actions.append(button);
+  if ( !actions || actions.querySelector(".lorelinks-open-graph") ) return;
+  actions.append(headerButton("lorelinks-open-graph", "fa-solid fa-diagram-project", "LORELINKS.Graph.Open",
+    () => GraphView.open()));
+  if ( (app.documentName === "JournalEntry") && game.user.isGM ) {
+    actions.append(
+      headerButton("lorelinks-obsidian-export", "fa-solid fa-file-export", "LORELINKS.Obsidian.Export.Title",
+        openExportDialog, true),
+      headerButton("lorelinks-obsidian-import", "fa-solid fa-file-import", "LORELINKS.Obsidian.Import.Title",
+        openImportDialog, true)
+    );
+  }
 }
 
-Hooks.on("renderJournalDirectory", addGraphButton);
-Hooks.on("renderActorDirectory", addGraphButton);
-Hooks.on("renderItemDirectory", addGraphButton);
+Hooks.on("renderJournalDirectory", addHeaderButtons);
+Hooks.on("renderActorDirectory", addHeaderButtons);
+Hooks.on("renderItemDirectory", addHeaderButtons);
