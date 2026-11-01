@@ -41,6 +41,18 @@ function getSuggestions(query) {
       }
     }
   }
+
+  // Actors are offered too. When a journal entry has the same name, the Actor: prefix keeps the link unambiguous.
+  const actorLabel = game.i18n.localize("LORELINKS.Type.Actor");
+  for ( const actor of game.actors ) {
+    if ( !actor.testUserPermission(game.user, "LIMITED") ) continue;
+    const actorRank = rankOf(actor.name);
+    if ( actorRank < 0 ) continue;
+    const name = normalizeName(actor.name);
+    const clashes = game.journal.some(j => normalizeName(j.name) === name);
+    results.push({ insert: clashes ? `Actor:${actor.name}` : actor.name, label: `${actor.name} (${actorLabel})`,
+      rank: actorRank + 0.25 });
+  }
   results.sort((a, b) => (a.rank - b.rank) || a.label.localeCompare(b.label, game.i18n.lang));
   return results.slice(0, MAX_SUGGESTIONS);
 }
@@ -54,7 +66,7 @@ function buildEntries(query) {
   const suggestions = getSuggestions(query);
   const entries = suggestions.map(s => ({ identifier: s.insert, label: s.label }));
   const trimmed = query.trim();
-  const exists = suggestions.some(s => normalizeName(s.insert) === normalizeName(trimmed));
+  const exists = suggestions.some(s => normalizeName(s.insert.replace(/^Actor:/, "")) === normalizeName(trimmed));
   if ( trimmed && !exists ) {
     entries.push({ identifier: trimmed, label: game.i18n.format("LORELINKS.NewNote", { name: trimmed }) });
   }

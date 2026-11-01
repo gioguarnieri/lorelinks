@@ -1,7 +1,7 @@
 {
   "id": "lorelinks",
   "title": "LoreLinks",
-  "description": "Obsidian-style [[wikilinks]] for Foundry VTT journals, with autocomplete.",
+  "description": "Obsidian-style [[wikilinks]], autocomplete and a graph view for Foundry VTT journals and characters.",
   "version": "0.1.0",
   "authors": [
     {

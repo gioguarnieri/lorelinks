@@ -2,6 +2,24 @@
   "LORELINKS": {
     "Unresolved": "Ainda não existe uma nota chamada \"{name}\". Clique para criá-la.",
     "CannotCreate": "Não existe uma nota chamada \"{name}\", e você não tem permissão para criar entradas de diário.",
-    "NewNote": "Vincular nova nota \"{name}\""
+    "NewNote": "Vincular nova nota \"{name}\"",
+    "Type": {
+      "Actor": "Ator"
+    },
+    "Graph": {
+      "Title": "Grafo do LoreLinks",
+      "Open": "Grafo",
+      "Search": "Buscar notas…",
+      "Show": {
+        "actors": "Atores",
+        "unresolved": "Notas inexistentes",
+        "orphans": "Sem vínculos"
+      },
+      "Kind": {
+        "journal": "Diário",
+        "actor": "Ator",
+        "unresolved": "Nota inexistente"
+      }
+    }
   }
 }

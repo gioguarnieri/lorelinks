@@ -2,6 +2,24 @@
   "LORELINKS": {
     "Unresolved": "No note named \"{name}\" yet. Click to create it.",
     "CannotCreate": "No note named \"{name}\" exists, and you are not allowed to create journal entries.",
-    "NewNote": "Link new note \"{name}\""
+    "NewNote": "Link new note \"{name}\"",
+    "Type": {
+      "Actor": "Actor"
+    },
+    "Graph": {
+      "Title": "LoreLinks Graph",
+      "Open": "Graph",
+      "Search": "Search notes…",
+      "Show": {
+        "actors": "Actors",
+        "unresolved": "Missing notes",
+        "orphans": "Unlinked"
+      },
+      "Kind": {
+        "journal": "Journal",
+        "actor": "Actor",
+        "unresolved": "Missing note"
+      }
+    }
   }
 }
