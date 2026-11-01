@@ -4,7 +4,8 @@
     "CannotCreate": "Não existe uma nota chamada \"{name}\", e você não tem permissão para criar entradas de diário.",
     "NewNote": "Vincular nova nota \"{name}\"",
     "Type": {
-      "Actor": "Ator"
+      "Actor": "Ator",
+      "Item": "Item"
     },
     "Graph": {
       "Title": "Grafo do LoreLinks",
@@ -13,13 +14,33 @@
       "Show": {
         "actors": "Atores",
         "unresolved": "Notas inexistentes",
-        "orphans": "Sem vínculos"
+        "orphans": "Sem vínculos",
+        "items": "Itens"
       },
       "Kind": {
         "journal": "Diário",
         "actor": "Ator",
-        "unresolved": "Nota inexistente"
+        "unresolved": "Nota inexistente",
+        "item": "Item"
       }
+    },
+    "Settings": {
+      "RenameLinks": {
+        "Name": "Atualizar vínculos ao renomear",
+        "Hint": "Quando uma entrada de diário, página, ator ou item é renomeado, reescreve os [[vínculos]] que apontam para ele para que continuem funcionando.",
+        "Ask": "Perguntar sempre",
+        "Always": "Sempre atualizar",
+        "Never": "Nunca atualizar"
+      }
+    },
+    "Rename": {
+      "Title": "Atualizar vínculos?",
+      "Prompt": "\"{old}\" foi renomeado para \"{new}\". Atualizar {count} vínculo(s) em {sources} documento(s) para que continuem apontando para ele?",
+      "Update": "Atualizar vínculos",
+      "Keep": "Deixar como está",
+      "Done": "{count} vínculo(s) atualizado(s) para \"{name}\".",
+      "Skipped": "{count} campo(s) de texto não foram atualizados porque você não é dono deles.",
+      "NoPermission": "Os vínculos para \"{name}\" não foram atualizados porque você não é dono dos documentos que os contêm."
     }
   }
 }

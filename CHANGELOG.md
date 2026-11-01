@@ -9,4 +9,6 @@
 - Wikilinks and autocomplete in actor biographies and other rich-text fields, for any game system
 - Graph view of journal entries, actors and missing notes, with search, filters, zoom and drag
 - `Ctrl+Shift+G` keybinding and Graph buttons in the Journal and Actors sidebars
+- Links to world items, with `[[Item:Name]]`; item descriptions are indexed and items appear in the graph
+- Renaming a journal entry, page, actor or item updates the links pointing to it (setting: ask, always or never)
 - English and Brazilian Portuguese translations

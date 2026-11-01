@@ -5,12 +5,12 @@ import { MODULE_ID, WIKILINK_PATTERN } from "./constants.mjs";
  * @property {string} target          The note being linked to, without any type prefix.
  * @property {string} [section]       An optional page within the note (the part after #).
  * @property {string} [alias]         Optional text to display instead of the target (the part after |).
- * @property {string} [type]          "JournalEntry" or "Actor" when the link was written as [[Actor:Name]].
+ * @property {string} [type]          "JournalEntry", "Actor" or "Item" when the link was written as [[Actor:Name]].
  */
 
 /** Type prefixes that restrict a link to one kind of document, e.g. [[Actor:Rodolfo]]. */
-const TYPE_PREFIXES = { actor: "Actor", journal: "JournalEntry" };
-const PREFIX_PATTERN = new RegExp(`^(${Object.keys(TYPE_PREFIXES).join("|")}):(.+)$`, "i");
+const TYPE_PREFIXES = { actor: "Actor", item: "Item", journal: "JournalEntry" };
+export const PREFIX_PATTERN = new RegExp(`^(${Object.keys(TYPE_PREFIXES).join("|")}):(.+)$`, "i");
 
 /**
  * Normalize a name for case- and accent-insensitive comparison.
@@ -69,16 +69,18 @@ export function extractWikilinks(text) {
 
 /**
  * Find the document a wikilink points to.
- * Journal entries are matched first, then pages of any entry, then actors. A type prefix limits the search to one
- * kind of document. With a section, the page inside the matched entry is returned, falling back to the entry itself.
+ * Journal entries are matched first, then pages of any entry, then actors, then world items. A type prefix limits the
+ * search to one kind of document. With a section, the page inside the matched entry is returned, falling back to the
+ * entry itself.
  * @param {Wikilink} link
- * @returns {JournalEntry|JournalEntryPage|Actor|null}
+ * @returns {JournalEntry|JournalEntryPage|Actor|Item|null}
  */
 export function resolveWikilink({ target, section, type }) {
   const name = normalizeName(target);
   const findPage = (entry, pageName) => entry.pages.find(p => normalizeName(p.name) === pageName);
+  const allows = documentName => !type || (type === documentName);
 
-  if ( type !== "Actor" ) {
+  if ( allows("JournalEntry") ) {
     const entry = game.journal.find(j => normalizeName(j.name) === name);
     if ( entry ) return (section && findPage(entry, normalizeName(section))) || entry;
 
@@ -87,7 +89,11 @@ export function resolveWikilink({ target, section, type }) {
       if ( page ) return page;
     }
   }
-  if ( type !== "JournalEntry" ) return game.actors.find(a => normalizeName(a.name) === name) ?? null;
+  if ( allows("Actor") ) {
+    const actor = game.actors.find(a => normalizeName(a.name) === name);
+    if ( actor ) return actor;
+  }
+  if ( allows("Item") ) return game.items.find(i => normalizeName(i.name) === name) ?? null;
   return null;
 }
 

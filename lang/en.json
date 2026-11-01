@@ -4,7 +4,8 @@
     "CannotCreate": "No note named \"{name}\" exists, and you are not allowed to create journal entries.",
     "NewNote": "Link new note \"{name}\"",
     "Type": {
-      "Actor": "Actor"
+      "Actor": "Actor",
+      "Item": "Item"
     },
     "Graph": {
       "Title": "LoreLinks Graph",
@@ -13,13 +14,33 @@
       "Show": {
         "actors": "Actors",
         "unresolved": "Missing notes",
-        "orphans": "Unlinked"
+        "orphans": "Unlinked",
+        "items": "Items"
       },
       "Kind": {
         "journal": "Journal",
         "actor": "Actor",
-        "unresolved": "Missing note"
+        "unresolved": "Missing note",
+        "item": "Item"
       }
+    },
+    "Settings": {
+      "RenameLinks": {
+        "Name": "Update links when renaming",
+        "Hint": "When a journal entry, page, actor or item is renamed, rewrite the [[links]] that point to it so they keep working.",
+        "Ask": "Ask each time",
+        "Always": "Always update",
+        "Never": "Never update"
+      }
+    },
+    "Rename": {
+      "Title": "Update links?",
+      "Prompt": "\"{old}\" was renamed to \"{new}\". Update {count} link(s) in {sources} document(s) so they keep pointing to it?",
+      "Update": "Update links",
+      "Keep": "Leave them",
+      "Done": "Updated {count} link(s) to \"{name}\".",
+      "Skipped": "{count} text field(s) were not updated because you do not own them.",
+      "NoPermission": "Links to \"{name}\" were not updated because you do not own the documents that contain them."
     }
   }
 }

@@ -8,16 +8,20 @@ suggests the notes and characters you can link to. Open the graph to see how eve
 
 ## Features
 
-- **Wikilinks** – `[[Note]]` links to the journal entry, page or actor with that name. Matching ignores case and
-  accents. Journal entries win when names clash; write `[[Actor:Name]]` to link the actor instead.
-- **Characters as notes** – links work in actor biographies and other rich-text fields, in any game system, and
-  `[[Character Name]]` opens the character sheet.
+- **Wikilinks** – `[[Note]]` links to the journal entry, page, actor or item with that name. Matching ignores case
+  and accents. When names clash, journal entries win, then actors, then items; write `[[Actor:Name]]` or
+  `[[Item:Name]]` to pick one explicitly (autocomplete adds the prefix for you).
+- **Characters and items as notes** – links work in actor biographies, item descriptions and other rich-text
+  fields, in any game system, and `[[Character Name]]` opens the character sheet.
+- **Rename-safe** – when a note, page, actor or item is renamed, LoreLinks rewrites the links that point to it,
+  keeping prefixes, `#sections` and `|aliases`. The **Update links when renaming** setting chooses between asking each
+  time (default), always updating, or never.
 - **Sections and aliases** – `[[Note#Page]]` links to a page inside a note, `[[Note|shown text]]` changes the text.
 - **Autocomplete** – type `[[` in any rich-text editor (journals, biographies) to pick a note or actor with the arrow
   keys and Enter.
 - **Graph view** – notes and actors as dots, links as lines. Zoom with the mouse wheel, drag to pan or move dots,
   hover to highlight connections, search by name, and click a dot to open it. Open it from the **Graph** button in
-  the Journal or Actors sidebar, or with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>.
+  the Journal, Actors or Items sidebar, or with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>.
 - **Unresolved links** – links to notes that do not exist yet are shown dashed; clicking one creates the note.
 - **Respects permissions** – players see plain text instead of a link when they cannot view the target, and the graph
   only shows what the viewing user is allowed to see.
@@ -39,7 +43,7 @@ Requires Foundry VTT version 14.
 
 - Backlinks panel listing the notes that link to the current one (the index already tracks backlinks)
 - Local graph centered on the open note
-- Updating links automatically when a note is renamed
+- Links inside items owned by actors (currently only world items are indexed)
 - Autocomplete in Markdown pages
 
 ## Development

@@ -1,5 +1,5 @@
 import { MAX_SUGGESTIONS } from "./constants.mjs";
-import { normalizeName } from "./wikilinks.mjs";
+import { normalizeName, PREFIX_PATTERN, resolveWikilink } from "./wikilinks.mjs";
 
 /** Text before the cursor that opens the menu: "[[" followed by a partial name without brackets, | or #. */
 const TRIGGER = /\[\[([^\[\]|#]*)$/;
@@ -12,7 +12,7 @@ const TRIGGER = /\[\[([^\[\]|#]*)$/;
  */
 
 /**
- * Collect journal entries and pages matching the typed query, visible to the current user.
+ * Collect journal entries, pages, actors and items matching the typed query, visible to the current user.
  * @param {string} query
  * @returns {Suggestion[]}
  */
@@ -42,16 +42,18 @@ function getSuggestions(query) {
     }
   }
 
-  // Actors are offered too. When a journal entry has the same name, the Actor: prefix keeps the link unambiguous.
-  const actorLabel = game.i18n.localize("LORELINKS.Type.Actor");
-  for ( const actor of game.actors ) {
-    if ( !actor.testUserPermission(game.user, "LIMITED") ) continue;
-    const actorRank = rankOf(actor.name);
-    if ( actorRank < 0 ) continue;
-    const name = normalizeName(actor.name);
-    const clashes = game.journal.some(j => normalizeName(j.name) === name);
-    results.push({ insert: clashes ? `Actor:${actor.name}` : actor.name, label: `${actor.name} (${actorLabel})`,
-      rank: actorRank + 0.25 });
+  // Actors and items are offered too. When a plain [[Name]] would reach a different document with the same name, a
+  // type prefix such as Actor: keeps the link pointing where the user chose.
+  for ( const [collection, documentName] of [[game.actors, "Actor"], [game.items, "Item"]] ) {
+    const typeLabel = game.i18n.localize(`LORELINKS.Type.${documentName}`);
+    for ( const doc of collection ) {
+      if ( !doc.testUserPermission(game.user, "LIMITED") ) continue;
+      const rank = rankOf(doc.name);
+      if ( rank < 0 ) continue;
+      const unambiguous = resolveWikilink({ target: doc.name }) === doc;
+      results.push({ insert: unambiguous ? doc.name : `${documentName}:${doc.name}`, label: `${doc.name} (${typeLabel})`,
+        rank: rank + (documentName === "Actor" ? 0.25 : 0.3) });
+    }
   }
   results.sort((a, b) => (a.rank - b.rank) || a.label.localeCompare(b.label, game.i18n.lang));
   return results.slice(0, MAX_SUGGESTIONS);
@@ -66,7 +68,7 @@ function buildEntries(query) {
   const suggestions = getSuggestions(query);
   const entries = suggestions.map(s => ({ identifier: s.insert, label: s.label }));
   const trimmed = query.trim();
-  const exists = suggestions.some(s => normalizeName(s.insert.replace(/^Actor:/, "")) === normalizeName(trimmed));
+  const exists = suggestions.some(s => normalizeName(s.insert.replace(PREFIX_PATTERN, "$2")) === normalizeName(trimmed));
   if ( trimmed && !exists ) {
     entries.push({ identifier: trimmed, label: game.i18n.format("LORELINKS.NewNote", { name: trimmed }) });
   }

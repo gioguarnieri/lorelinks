@@ -4,8 +4,8 @@ import { extractWikilinks, normalizeName, resolveWikilink } from "./wikilinks.mj
  * @typedef GraphNode
  * @property {string} id            The document UUID, or "unresolved:<name>" for notes that do not exist yet.
  * @property {string} label         The displayed name.
- * @property {"journal"|"actor"|"unresolved"} kind
- * @property {foundry.abstract.Document} [doc]  The journal entry or actor this node stands for.
+ * @property {"journal"|"actor"|"item"|"unresolved"} kind
+ * @property {foundry.abstract.Document} [doc]  The journal entry, actor or item this node stands for.
  */
 
 /**
@@ -15,30 +15,63 @@ import { extractWikilinks, normalizeName, resolveWikilink } from "./wikilinks.mj
  */
 
 /**
- * Paths of the HTML fields in an actor type's system data, e.g. "details.biography.value" for dnd5e characters.
- * Read from the system's data model so any game system works; cached per actor type.
+ * @typedef TextField
+ * @property {JournalEntryPage|Actor|Item} doc   The document that stores the text.
+ * @property {string} path                       The field's path for Document#update, e.g. "text.content".
+ * @property {string} value                      The stored text.
+ * @property {boolean} html                      Whether the text is HTML (otherwise Markdown or plain text).
+ */
+
+/** Graph node kind for each top-level document type. */
+const KINDS = { JournalEntry: "journal", Actor: "actor", Item: "item" };
+
+/**
+ * Paths of the HTML fields in a document type's system data, e.g. "system.details.biography.value" for dnd5e
+ * characters. Read from the system's data model so any game system works; cached per document and sub-type.
  * @type {Map<string, string[]>}
  */
 const htmlPathsByType = new Map();
 
 /**
- * @param {Actor} actor
+ * @param {Actor|Item} doc
  * @returns {string[]}
  */
-function htmlFieldPaths(actor) {
-  if ( htmlPathsByType.has(actor.type) ) return htmlPathsByType.get(actor.type);
+function htmlFieldPaths(doc) {
+  const key = `${doc.documentName}.${doc.type}`;
+  if ( htmlPathsByType.has(key) ) return htmlPathsByType.get(key);
   const { HTMLField, SchemaField } = foundry.data.fields;
   const paths = [];
   const walk = (field, prefix) => {
     if ( field instanceof HTMLField ) paths.push(prefix);
     else if ( field instanceof SchemaField ) {
-      for ( const [key, child] of Object.entries(field.fields) ) walk(child, prefix ? `${prefix}.${key}` : key);
+      for ( const [name, child] of Object.entries(field.fields) ) walk(child, `${prefix}.${name}`);
     }
   };
-  const schema = actor.system?.schema;
-  if ( schema ) walk(schema, "");
-  htmlPathsByType.set(actor.type, paths);
+  const schema = doc.system?.schema;
+  if ( schema ) walk(schema, "system");
+  htmlPathsByType.set(key, paths);
   return paths;
+}
+
+/**
+ * Every text field of a journal entry, actor or world item in which wikilinks can be written.
+ * @param {JournalEntry|Actor|Item} doc
+ * @returns {TextField[]}
+ */
+export function textFields(doc) {
+  const fields = [];
+  const add = (owner, path, html) => {
+    const value = foundry.utils.getProperty(owner, path);
+    if ( value ) fields.push({ doc: owner, path, value, html });
+  };
+  if ( doc instanceof JournalEntry ) {
+    for ( const page of doc.pages ) {
+      add(page, "text.content", true);
+      add(page, "text.markdown", false);
+    }
+  }
+  else for ( const path of htmlFieldPaths(doc) ) add(doc, path, true);
+  return fields;
 }
 
 /**
@@ -46,34 +79,30 @@ function htmlFieldPaths(actor) {
  * @param {string} html
  * @returns {string}
  */
-function toPlainText(html) {
+export function toPlainText(html) {
   if ( !html ) return "";
   return foundry.applications.ux.TextEditor.implementation.decodeHTML(html.replace(/<[^>]*>/g, ""));
 }
 
 /**
- * All the text in which a document can contain wikilinks.
- * @param {JournalEntry|Actor} doc
- * @returns {string}
+ * The documents whose text the index reads: all journal entries, actors and world items.
+ * @returns {(JournalEntry|Actor|Item)[]}
  */
-function linkableText(doc) {
-  if ( doc instanceof JournalEntry ) {
-    return doc.pages.map(p => `${toPlainText(p.text?.content)}\n${p.text?.markdown ?? ""}`).join("\n");
-  }
-  return htmlFieldPaths(doc).map(path => toPlainText(foundry.utils.getProperty(doc.system, path))).join("\n");
+export function linkableDocuments() {
+  return [...game.journal, ...game.actors, ...game.items];
 }
 
 /**
  * The graph node a resolved link points to. Links to a page count as links to its journal entry.
  * @param {foundry.abstract.Document} doc
- * @returns {JournalEntry|Actor}
+ * @returns {JournalEntry|Actor|Item}
  */
 function nodeDocument(doc) {
   return doc instanceof JournalEntryPage ? doc.parent : doc;
 }
 
 /**
- * Which documents link to which. Rebuilt lazily after any journal or actor changes.
+ * Which documents link to which. Rebuilt lazily after any journal, actor or item changes.
  */
 class LinkIndex {
   /** @type {Map<string, Set<string>>} Outgoing links: source UUID → target node ids. */
@@ -92,9 +121,10 @@ class LinkIndex {
   #rebuild() {
     this.#outgoing.clear();
     this.#unresolved.clear();
-    for ( const doc of [...game.journal, ...game.actors] ) {
+    for ( const doc of linkableDocuments() ) {
+      const text = textFields(doc).map(f => (f.html ? toPlainText(f.value) : f.value)).join("\n");
       const targets = new Set();
-      for ( const link of extractWikilinks(linkableText(doc)) ) {
+      for ( const link of extractWikilinks(text) ) {
         const resolved = resolveWikilink(link);
         if ( resolved ) targets.add(nodeDocument(resolved).uuid);
         else {
@@ -111,8 +141,8 @@ class LinkIndex {
 
   /**
    * The documents that link to a given document.
-   * @param {JournalEntry|Actor} doc
-   * @returns {(JournalEntry|Actor)[]}
+   * @param {JournalEntry|Actor|Item} doc
+   * @returns {(JournalEntry|Actor|Item)[]}
    */
   backlinks(doc) {
     if ( this.#dirty ) this.#rebuild();
@@ -127,22 +157,20 @@ class LinkIndex {
    * Nodes and edges visible to the current user. Documents the user cannot see are left out entirely.
    * @param {object} [options]
    * @param {boolean} [options.actors=true]       Include actors.
+   * @param {boolean} [options.items=true]        Include world items.
    * @param {boolean} [options.unresolved=true]   Include links to notes that do not exist yet.
    * @param {boolean} [options.orphans=true]      Include documents without any links.
    * @returns {GraphData}
    */
-  graph({ actors = true, unresolved = true, orphans = true } = {}) {
+  graph({ actors = true, items = true, unresolved = true, orphans = true } = {}) {
     if ( this.#dirty ) this.#rebuild();
+    const include = { JournalEntry: true, Actor: actors, Item: items };
     const nodes = new Map();
-    const visible = doc => doc.testUserPermission(game.user, "LIMITED");
-    for ( const entry of game.journal ) {
-      if ( visible(entry) ) nodes.set(entry.uuid, { id: entry.uuid, label: entry.name, kind: "journal", doc: entry });
+    for ( const doc of linkableDocuments() ) {
+      if ( !include[doc.documentName] || !doc.testUserPermission(game.user, "LIMITED") ) continue;
+      nodes.set(doc.uuid, { id: doc.uuid, label: doc.name, kind: KINDS[doc.documentName], doc });
     }
-    if ( actors ) {
-      for ( const actor of game.actors ) {
-        if ( visible(actor) ) nodes.set(actor.uuid, { id: actor.uuid, label: actor.name, kind: "actor", doc: actor });
-      }
-    }
+
     // Missing notes only appear when a visible document links to them, so hidden notes never leak names.
     const edges = [];
     for ( const [source, targets] of this.#outgoing ) {
@@ -165,7 +193,7 @@ class LinkIndex {
 export const linkIndex = new LinkIndex();
 
 /**
- * Keep the index fresh: any change to journals or actors may add, remove or rename link targets.
+ * Keep the index fresh: any change to journals, actors or items may add, remove or rename link targets.
  * @param {function(): void} onChange  Called after the index was invalidated.
  */
 export function watchDocuments(onChange) {
@@ -173,7 +201,7 @@ export function watchDocuments(onChange) {
     linkIndex.invalidate();
     onChange();
   };
-  for ( const type of ["JournalEntry", "JournalEntryPage", "Actor"] ) {
+  for ( const type of ["JournalEntry", "JournalEntryPage", "Actor", "Item"] ) {
     for ( const action of ["create", "update", "delete"] ) Hooks.on(`${action}${type}`, invalidate);
   }
 }

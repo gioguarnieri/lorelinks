@@ -14,14 +14,14 @@ const LAYOUT = {
   minAlpha: 0.004
 };
 
-const COLORS = { journal: "#d9a74a", actor: "#5fa8e8", unresolved: "#8a8a8a", edge: "rgba(190, 190, 190, 0.6)",
+const COLORS = { journal: "#d9a74a", actor: "#5fa8e8", item: "#6cc489", unresolved: "#8a8a8a", edge: "rgba(190, 190, 190, 0.6)",
   edgeActive: "rgba(255, 200, 120, 0.9)" };
 
 /**
  * @typedef SimNode
  * @property {string} id
  * @property {string} label
- * @property {"journal"|"actor"|"unresolved"} kind
+ * @property {"journal"|"actor"|"item"|"unresolved"} kind
  * @property {foundry.abstract.Document} [doc]
  * @property {number} x
  * @property {number} y
@@ -32,7 +32,7 @@ const COLORS = { journal: "#d9a74a", actor: "#5fa8e8", unresolved: "#8a8a8a", ed
  */
 
 /**
- * A window showing journal entries and actors as nodes, connected by their wikilinks.
+ * A window showing journal entries, actors and items as nodes, connected by their wikilinks.
  */
 export class GraphView extends ApplicationV2 {
   /** @override */
@@ -57,12 +57,12 @@ export class GraphView extends ApplicationV2 {
     return this.#instance;
   }
 
-  /** Reload the graph's data if the window is open. Called when journals or actors change. */
+  /** Reload the graph's data if the window is open. Called when journals, actors or items change. */
   static refresh = foundry.utils.debounce(() => {
     if ( GraphView.#instance?.rendered ) GraphView.#instance.#loadData();
   }, 300);
 
-  #filters = { actors: true, unresolved: true, orphans: true };
+  #filters = { actors: true, items: true, unresolved: true, orphans: true };
   #search = "";
 
   /** @type {SimNode[]} */
@@ -111,7 +111,7 @@ export class GraphView extends ApplicationV2 {
       this.#draw();
     });
     toolbar.append(search);
-    for ( const key of ["actors", "unresolved", "orphans"] ) {
+    for ( const key of ["actors", "items", "unresolved", "orphans"] ) {
       const label = document.createElement("label");
       const box = document.createElement("input");
       Object.assign(box, { type: "checkbox", checked: this.#filters[key] });
@@ -125,7 +125,7 @@ export class GraphView extends ApplicationV2 {
 
     const legend = document.createElement("div");
     legend.classList.add("lorelinks-graph-legend");
-    for ( const kind of ["journal", "actor", "unresolved"] ) {
+    for ( const kind of ["journal", "actor", "item", "unresolved"] ) {
       const item = document.createElement("span");
       item.style.setProperty("--swatch", COLORS[kind]);
       item.dataset.kind = kind;

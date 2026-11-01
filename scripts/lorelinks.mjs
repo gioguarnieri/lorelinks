@@ -3,9 +3,11 @@ import { activateUnresolvedListener, registerEnricher, resolveWikilink } from ".
 import { createAutocompletePlugin } from "./autocomplete.mjs";
 import { linkIndex, watchDocuments } from "./link-index.mjs";
 import { GraphView } from "./graph.mjs";
+import { registerRenameHandling } from "./rename.mjs";
 
 Hooks.once("init", () => {
   registerEnricher();
+  registerRenameHandling();
   game.keybindings.register(MODULE_ID, "openGraph", {
     name: "LORELINKS.Graph.Open",
     editable: [{ key: "KeyG", modifiers: ["Control", "Shift"] }],
@@ -31,7 +33,7 @@ Hooks.on("createProseMirrorEditor", (uuid, plugins) => {
 });
 
 /**
- * Add an "Open graph" button to the header of the Journal and Actors sidebar tabs.
+ * Add an "Open graph" button to the header of the Journal, Actors and Items sidebar tabs.
  * @param {foundry.applications.sidebar.DocumentDirectory} app
  * @param {HTMLElement} html
  */
@@ -49,3 +51,4 @@ function addGraphButton(app, html) {
 
 Hooks.on("renderJournalDirectory", addGraphButton);
 Hooks.on("renderActorDirectory", addGraphButton);
+Hooks.on("renderItemDirectory", addGraphButton);
