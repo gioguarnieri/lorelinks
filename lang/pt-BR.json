@@ -1,0 +1,7 @@
+{
+  "LORELINKS": {
+    "Unresolved": "Ainda não existe uma nota chamada \"{name}\". Clique para criá-la.",
+    "CannotCreate": "Não existe uma nota chamada \"{name}\", e você não tem permissão para criar entradas de diário.",
+    "NewNote": "Vincular nova nota \"{name}\""
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "lorelinks",
+  "title": "LoreLinks",
+  "description": "Obsidian-style [[wikilinks]] for Foundry VTT journals, with autocomplete.",
+  "version": "0.1.0",
+  "authors": [
+    {
+      "name": "Giovanni Guarnieri",
+      "url": "https://github.com/gioguarnieri"
+    }
+  ],
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14.369"
+  },
+  "esmodules": ["scripts/lorelinks.mjs"],
+  "styles": ["styles/lorelinks.css"],
+  "languages": [
+    { "lang": "en", "name": "English", "path": "lang/en.json" },
+    { "lang": "pt-BR", "name": "Português (Brasil)", "path": "lang/pt-BR.json" }
+  ],
+  "url": "https://github.com/gioguarnieri/lorelinks",
+  "manifest": "https://github.com/gioguarnieri/lorelinks/releases/latest/download/module.json",
+  "download": "https://github.com/gioguarnieri/lorelinks/releases/latest/download/lorelinks.zip",
+  "bugs": "https://github.com/gioguarnieri/lorelinks/issues",
+  "readme": "https://github.com/gioguarnieri/lorelinks/blob/main/README.md",
+  "changelog": "https://github.com/gioguarnieri/lorelinks/blob/main/CHANGELOG.md",
+  "license": "LICENSE"
+}

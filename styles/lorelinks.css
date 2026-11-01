@@ -1,0 +1,17 @@
+/* Links to notes that do not exist yet, styled like Obsidian's unresolved links. */
+a.lorelinks-unresolved {
+  color: var(--color-text-secondary, #8a8a8a);
+  border-bottom: 1px dashed currentColor;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+a.lorelinks-unresolved:hover {
+  opacity: 1;
+  text-shadow: 0 0 6px var(--color-shadow-primary, #ff6400);
+}
+
+/* Links to notes the current user cannot see render as plain text. */
+span.lorelinks-hidden {
+  font-style: inherit;
+}

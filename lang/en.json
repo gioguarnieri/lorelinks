@@ -1,0 +1,7 @@
+{
+  "LORELINKS": {
+    "Unresolved": "No note named \"{name}\" yet. Click to create it.",
+    "CannotCreate": "No note named \"{name}\" exists, and you are not allowed to create journal entries.",
+    "NewNote": "Link new note \"{name}\""
+  }
+}
