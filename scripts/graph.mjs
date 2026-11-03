@@ -11,7 +11,9 @@ const LAYOUT = {
   gravity: 0.012,      // Pull toward the center, which keeps unlinked nodes from drifting away.
   friction: 0.6,       // Fraction of velocity kept each step.
   cooling: 0.985,      // Activity decay per step; the simulation stops when it is nearly still.
-  minAlpha: 0.004
+  minAlpha: 0.004,
+  minDistance: 10,     // Closer nodes repel as if this far apart, so overlapping nodes are not flung away.
+  maxSpeed: 40         // Largest distance a node moves in one step.
 };
 
 const COLORS = { journal: "#d9a74a", actor: "#5fa8e8", item: "#6cc489", unresolved: "#8a8a8a", edge: "rgba(190, 190, 190, 0.6)",
@@ -223,10 +225,10 @@ export class GraphView extends ApplicationV2 {
         if ( d2 < 1 ) {
           dx = Math.random() - 0.5;
           dy = Math.random() - 0.5;
-          d2 = 1;
+          d2 = (dx * dx) + (dy * dy) || 1;
         }
-        const f = (LAYOUT.repulsion * alpha) / d2;
         const d = Math.sqrt(d2);
+        const f = (LAYOUT.repulsion * alpha) / Math.max(d2, LAYOUT.minDistance ** 2);
         const fx = (dx / d) * f;
         const fy = (dy / d) * f;
         a.vx -= fx; a.vy -= fy;
@@ -251,6 +253,11 @@ export class GraphView extends ApplicationV2 {
       }
       node.vx = (node.vx - (node.x * LAYOUT.gravity * alpha)) * LAYOUT.friction;
       node.vy = (node.vy - (node.y * LAYOUT.gravity * alpha)) * LAYOUT.friction;
+      const speed = Math.hypot(node.vx, node.vy);
+      if ( speed > LAYOUT.maxSpeed ) {
+        node.vx *= LAYOUT.maxSpeed / speed;
+        node.vy *= LAYOUT.maxSpeed / speed;
+      }
       node.x += node.vx;
       node.y += node.vy;
     }

@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 – Unreleased
+## 0.1.0 – 2026-11-03
 
 - `[[wikilinks]]` to journal entries and pages, with `#section` and `|alias` support
 - Autocomplete when typing `[[` in the journal editor
